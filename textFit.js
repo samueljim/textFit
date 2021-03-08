@@ -123,8 +123,6 @@
             " before using textFit!"
         );
     }
-    let fragment = new DocumentFragment();
-
     // Add textFitted span inside this container.
     if (originalHTML.indexOf("textFitted") === -1) {
       innerSpan = document.createElement("span");
@@ -166,14 +164,12 @@
     ) {
       multiLine = true;
     }
-
-    // If we're not treating this as a multiline string, don't let it wrap.
+    // If we're not treating this as a multiline string, don't var it wrap.
     if (!multiLine) {
       el.style["white-space"] = "nowrap";
     }
 
     var maxLine = parseInt(el.dataset.maxLine || settings.maxLines);
-
     var startingSize = innerSpan.style.fontSize;
 
     low = settings.minFontSize;
@@ -183,10 +179,10 @@
     while (low <= high) {
       mid = parseFloat(((high + low) / 2).toFixed(2));
       innerSpan.style.fontSize = mid + settings.fontUnit;
-      let scrollWidth = innerSpan.scrollWidth <= originalWidth;
-      let scrollHeight =
+      var scrollWidth = innerSpan.scrollWidth <= originalWidth;
+      var scrollHeight =
         settings.widthOnly || innerSpan.scrollHeight <= originalHeight;
-      let maxLines = Number.isInteger(maxLine)
+      var maxLines = Number.isInteger(maxLine)
         ? countLines(innerSpan) > maxLine
         : false;
       if (scrollWidth && scrollHeight && !maxLines) {
@@ -200,7 +196,7 @@
     if (startingSize !== size) {
       console.log("textFit font changed size: ", size + settings.fontUnit);
     }
-    // found, updating font if differs:
+    // updating font if differs:
     if (innerSpan.style.fontSize != size + settings.fontUnit)
       innerSpan.style.fontSize = size + settings.fontUnit;
 
@@ -274,7 +270,7 @@
     );
   }
 
-  //Returns true if it is a DOM element
+  // Returns true if it is a DOM element
   function isElement(o) {
     return typeof HTMLElement === "object"
       ? o instanceof HTMLElement //DOM2
@@ -291,26 +287,25 @@
 
   // count the number of lines
   function countLines(target) {
-    let style = window.getComputedStyle(target, null);
-    let height = parseInt(style.getPropertyValue("height"));
-    let font_size = parseInt(style.getPropertyValue("font-size"));
-    let line_height = parseInt(style.getPropertyValue("line-height"));
-    let box_sizing = style.getPropertyValue("box-sizing");
+    var style = window.getComputedStyle(target, null);
+    var height = parseInt(style.getPropertyValue("height"));
+    var font_size = parseInt(style.getPropertyValue("font-size"));
+    var line_height = parseInt(style.getPropertyValue("line-height"));
+    var box_sizing = style.getPropertyValue("box-sizing");
 
     if (isNaN(line_height)) line_height = font_size * 1.2;
 
     if (box_sizing == "border-box") {
-      let padding_top = parseInt(style.getPropertyValue("padding-top"));
-      let padding_bottom = parseInt(style.getPropertyValue("padding-bottom"));
-      let border_top = parseInt(style.getPropertyValue("border-top-width"));
-      let border_bottom = parseInt(
+      var padding_top = parseInt(style.getPropertyValue("padding-top"));
+      var padding_bottom = parseInt(style.getPropertyValue("padding-bottom"));
+      var border_top = parseInt(style.getPropertyValue("border-top-width"));
+      var border_bottom = parseInt(
         style.getPropertyValue("border-bottom-width")
       );
       height =
         height - padding_top - padding_bottom - border_top - border_bottom;
     }
-    let lines = Math.ceil(height / line_height);
-    // alert("Lines: " + lines);
+    var lines = Math.ceil(height / line_height);
     return lines;
   }
 
