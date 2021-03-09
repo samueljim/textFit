@@ -38,7 +38,7 @@
     maxLines: false, // if true, textFit will throw and error if the text is over the supplied number of lines
     detectMultiLine: true, // disable to turn off automatic multi-line sensing
     fontUnit: "px", // what unit should the final font be. using rems or mm is sometimes useful
-    fontChangeSize: 1, // how much should the font size by ajusted by each time. 0.1 and 0.01 is useful for when using a rem font unit
+    fontChangeSize: 0.1, // how much should the font size by ajusted by each time. 0.1 and 0.01 is useful for when using a rem font unit
     minFontSize: 6,
     display: "inline-block", // in case you need to change this
     maxFontSize: 80,
@@ -160,7 +160,7 @@
       settings.detectMultiLine &&
       !multiLine &&
       innerSpan.scrollHeight >=
-        parseInt(window.getComputedStyle(innerSpan)["font-size"], 10) * 2
+        parseFloat(window.getComputedStyle(innerSpan)["font-size"], 10) * 2
     ) {
       multiLine = true;
     }
@@ -182,9 +182,12 @@
       var scrollWidth = innerSpan.scrollWidth <= originalWidth;
       var scrollHeight =
         settings.widthOnly || innerSpan.scrollHeight <= originalHeight;
-      var maxLines = Number.isInteger(maxLine)
-        ? countLines(innerSpan) > maxLine
-        : false;
+      var maxLines = false;
+      if (Number.isInteger(maxLine)) {
+        var lineCount = countLines(innerSpan);
+        maxLines = lineCount > maxLine;
+      }
+
       if (scrollWidth && scrollHeight && !maxLines) {
         size = mid;
         low = mid + settings.fontChangeSize;
@@ -215,10 +218,12 @@
       // detect if data max lines has been exceeded
       if (Number.isInteger(maxLine)) {
         el.classList.remove("overflow");
-        el.dataset.customOverflowMessage = null;
-        if (countLines(innerSpan) > maxLine) {
+        delete el.dataset.customOverflowMessage;
+        var lineCount = countLines(innerSpan);
+        el.dataset.lineCount = lineCount;
+        if (lineCount > maxLine) {
           el.dataset.customOverflowMessage =
-            "Too much content has been added to the input for the allowed space";
+            "Too much content has been added for the allowed space";
           el.classList.add("overflow");
         }
       }
@@ -252,12 +257,25 @@
 
   // Calculate height without padding.
   function innerHeight(el) {
+    // var style = window.getComputedStyle(el, null);
+    // return (
+    //   el.clientHeight -
+    //   parseFloat(style.getPropertyValue("padding-top"), 10) -
+    //   parseFloat(style.getPropertyValue("padding-bottom"), 10)
+    // );
+
     var style = window.getComputedStyle(el, null);
-    return (
-      el.clientHeight -
-      parseInt(style.getPropertyValue("padding-top"), 10) -
-      parseInt(style.getPropertyValue("padding-bottom"), 10)
-    );
+    var height = parseFloat(style.getPropertyValue("height"));
+    var box_sizing = style.getPropertyValue("box-sizing");
+    if (box_sizing == 'border-box')
+    {
+      var padding_top = parseFloat(style.getPropertyValue("padding-top"));
+      var padding_bottom = parseFloat(style.getPropertyValue("padding-bottom"));
+      var border_top = parseFloat(style.getPropertyValue("border-top-width"));
+      var border_bottom = parseFloat(style.getPropertyValue("border-bottom-width"));
+      height = height - padding_top - padding_bottom - border_top - border_bottom
+    }
+    return height;
   }
 
   // Calculate width without padding.
@@ -265,8 +283,8 @@
     var style = window.getComputedStyle(el, null);
     return (
       el.clientWidth -
-      parseInt(style.getPropertyValue("padding-left"), 10) -
-      parseInt(style.getPropertyValue("padding-right"), 10)
+      parseFloat(style.getPropertyValue("padding-left"), 10) -
+      parseFloat(style.getPropertyValue("padding-right"), 10)
     );
   }
 
@@ -285,27 +303,18 @@
     return (" " + element.className + " ").indexOf(" " + cls + " ") > -1;
   }
 
-  // count the number of lines
+  // count the number of lines inside of the current direct element  
   function countLines(target) {
-    var style = window.getComputedStyle(target, null);
-    var height = parseInt(style.getPropertyValue("height"));
-    var font_size = parseInt(style.getPropertyValue("font-size"));
-    var line_height = parseInt(style.getPropertyValue("line-height"));
-    var box_sizing = style.getPropertyValue("box-sizing");
-
-    if (isNaN(line_height)) line_height = font_size * 1.2;
-
-    if (box_sizing == "border-box") {
-      var padding_top = parseInt(style.getPropertyValue("padding-top"));
-      var padding_bottom = parseInt(style.getPropertyValue("padding-bottom"));
-      var border_top = parseInt(style.getPropertyValue("border-top-width"));
-      var border_bottom = parseInt(
-        style.getPropertyValue("border-bottom-width")
-      );
-      height =
-        height - padding_top - padding_bottom - border_top - border_bottom;
-    }
-    var lines = Math.ceil(height / line_height);
+    var testBox = document.createElement("span")
+    // testBox.setAttribute('style', target.getAttribute('style'));
+    testBox.style.fontSize = target.style.fontSize;
+    testBox.style.display = 'inline-block';
+    testBox.innerText = '⠀';
+    target.appendChild(testBox);
+    var oneLineHeight = innerHeight(testBox);
+    testBox.remove();
+    var lines = innerHeight(target) / oneLineHeight;
+    console.table({oneLineHeight, lines})
     return lines;
   }
 

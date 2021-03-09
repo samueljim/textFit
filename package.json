@@ -30,6 +30,7 @@
     "registry": "https://registry.npmjs.org"
   },
   "devDependencies": {
+    "@babel/core": "^7.0.0",
     "uglify-js": "^2.4.17"
   }
 }

@@ -96,8 +96,8 @@ html {
 .textfit {
     border: 2px solid #453536;
     width: 200px; 
- height: 200px;
-    /* line-height: 1; */
+    height: 200px;
+    line-height: 2;
 }
 
 p {
