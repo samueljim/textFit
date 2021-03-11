@@ -35,7 +35,7 @@
     alignHoriz: false, // if true, textFit will set text-align: center
     multiLine: false, // if true, textFit will not set white-space: no-wrap
     stopOverflow: false, // if true, a error we be thrown if the content is overflowing
-    maxLines: false, // if true, textFit will throw and error if the text is over the supplied number of lines
+    maxLine: false, // if true, textFit will throw and error if the text is over the supplied number of lines
     detectMultiLine: true, // disable to turn off automatic multi-line sensing
     fontUnit: "px", // what unit should the final font be. using rems or mm is sometimes useful
     fontChangeSize: 0.1, // how much should the font size by ajusted by each time. 0.1 and 0.01 is useful for when using a rem font unit
@@ -169,7 +169,7 @@
       el.style["white-space"] = "nowrap";
     }
 
-    var maxLine = parseInt(el.dataset.maxLine || settings.maxLines);
+    var maxLine = parseInt(el.dataset.maxLine || settings.maxLine);
     var startingSize = innerSpan.style.fontSize;
 
     low = settings.minFontSize;
@@ -179,9 +179,12 @@
     while (low <= high) {
       mid = parseFloat(((high + low) / 2).toFixed(2));
       innerSpan.style.fontSize = mid + settings.fontUnit;
+
       var scrollWidth = innerSpan.scrollWidth <= originalWidth;
       var scrollHeight =
         settings.widthOnly || innerSpan.scrollHeight <= originalHeight;
+
+      // check if too many lines and if it is then we need to adjust the font size accordingly
       var maxLines = false;
       if (Number.isInteger(maxLine)) {
         var lineCount = countLines(innerSpan);
@@ -257,13 +260,6 @@
 
   // Calculate height without padding.
   function innerHeight(el) {
-    // var style = window.getComputedStyle(el, null);
-    // return (
-    //   el.clientHeight -
-    //   parseFloat(style.getPropertyValue("padding-top"), 10) -
-    //   parseFloat(style.getPropertyValue("padding-bottom"), 10)
-    // );
-
     var style = window.getComputedStyle(el, null);
     var height = parseFloat(style.getPropertyValue("height"));
     var box_sizing = style.getPropertyValue("box-sizing");
@@ -281,11 +277,17 @@
   // Calculate width without padding.
   function innerWidth(el) {
     var style = window.getComputedStyle(el, null);
-    return (
-      el.clientWidth -
-      parseFloat(style.getPropertyValue("padding-left"), 10) -
-      parseFloat(style.getPropertyValue("padding-right"), 10)
-    );
+    var width = parseFloat(style.getPropertyValue("width"));
+    var box_sizing = style.getPropertyValue("box-sizing");
+    if (box_sizing == 'border-box')
+    {
+      var padding_left = parseFloat(style.getPropertyValue("padding-left"));
+      var padding_right = parseFloat(style.getPropertyValue("padding-right"));
+      var border_left = parseFloat(style.getPropertyValue("border-left-width"));
+      var border_right = parseFloat(style.getPropertyValue("border-right-width"));
+      width = width - padding_left - padding_right - border_left - border_right;
+    }
+    return width;
   }
 
   // Returns true if it is a DOM element
@@ -314,7 +316,6 @@
     var oneLineHeight = innerHeight(testBox);
     testBox.remove();
     var lines = innerHeight(target) / oneLineHeight;
-    console.table({oneLineHeight, lines})
     return lines;
   }
 

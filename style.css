@@ -65,13 +65,15 @@ html {
 .body, .body2 {
     display: flex;
     justify-content: space-evenly;
+    flex-wrap: wrap;
     width: 100%;
 }
 .body2 {
 }
 .body2 .body2-container {
-    width: 200px;
+  
     height: 200px;
+    width: 200px;
     font-size: 10rem
 }
 .body2 .card p {
@@ -80,6 +82,9 @@ html {
 }
 .card {
     position: relative;
+    flex: 1 1 23%;
+    margin-top: 4rem;
+    margin-left: 1rem;
 }
 .info {
     border: 1px solid #1F2A44;
@@ -95,7 +100,8 @@ html {
 }
 .textfit {
     border: 2px solid #453536;
-    width: 200px; 
+    width: 100%;
+    max-width: 18rem;
     height: 200px;
     line-height: 2;
 }

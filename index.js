@@ -80,22 +80,21 @@ function countLines(target) {
   var ipsum = new LoremIpsum();
   const run = (text) => {
     document.querySelectorAll('.textFit p').forEach((item) => {
-      item.innerText = ipsum.paragraph(1,20) || 'error making text';
+      item.innerText = ipsum.paragraph(1,200) || 'error making text';
     })
-    textFit(document.querySelectorAll('.textFit p'), { alignVert: true });
+    textFit(document.querySelectorAll('.textFit p'), { alignVert: true, minFontSize: 1 });
 
     document.querySelectorAll('.body .card').forEach((item) => {
       let style = window.getComputedStyle(item.querySelector('.textFitted'), null);
       item.querySelector('.fontSize').innerText = style.getPropertyValue("font-size");
-      let lines =  countLinesAdvanced2(item.querySelector('.textFitted'));
-      item.querySelector('.lines').innerText = lines;
-      // console.table({ "countLines": lines })
+      // let lines =  countLinesAdvanced2(item.querySelector('.textFitted'));
+      item.querySelector('.lines').innerText = item.querySelector('p').dataset.lineCount;
     });
 
-    document.querySelector('.body2 .card p').innerHTML = ipsum.paragraph(2,2);
-    textFit(document.querySelector('.body2-container'), { minFontSize: 1, maxFontSize: 100, fontUnit:'%', fontChangeSize: 0.01 });
+    // document.querySelector('.body2 .card p').innerHTML = ipsum.paragraph(2,2);
+    // textFit(document.querySelector('.body2-container'), { minFontSize: 1, maxFontSize: 100, fontUnit:'%', fontChangeSize: 0.01 });
   }
-// setInterval(()=>run(),2500)
+setInterval(()=>run(),2500)
 run()
 // document.querySelector('.textInput').addEventListener('change', (e) => {
 //   let text = e.target.value;
